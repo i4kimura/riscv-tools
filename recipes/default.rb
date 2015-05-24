@@ -17,8 +17,6 @@ execute "update package index" do
   action :nothing
 end.run_action(:run)
 
-log "done update"
-
 packages = %w{autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf}
 packages.each do |pkg|
   package pkg do
@@ -26,7 +24,7 @@ packages.each do |pkg|
   end
 end
 
-git "#{Chef::Config['file_cache_path']}/riscv-tools" do
+git "/home/vagrant/riscv-tools" do
   repository "https://github.com/riscv/riscv-tools.git"
   revision "master"
   enable_submodules true
@@ -34,7 +32,7 @@ git "#{Chef::Config['file_cache_path']}/riscv-tools" do
 end
 
 bash "Set Environment of RISCV-tools" do
-  code "sed -i 's/JOBS=16/JOBS=1/' #{Chef::Config['file_cache_path']}/riscv-tools/build.common"
+  code "sed -i 's/JOBS=16/JOBS=1/' /home/vagrant/riscv-tools/build.common"
   action :run
 end
 
@@ -43,8 +41,7 @@ ENV['RISCV'] = "/home/vagrant/riscv"
 ENV['PATH']  = "/home/vagrant/riscv/bin:#{ENV["PATH"]}"
 
 execute "Build RISCV-tools" do
-  cwd "#{Chef::Config['file_cache_path']}/vagrant/riscv-tools/"
+  cwd "/home/vagrant/riscv-tools/"
   command "./build.sh"
   action :run
 end
-
