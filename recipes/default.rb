@@ -17,7 +17,7 @@ execute "update package index" do
   action :nothing
 end.run_action(:run)
 
-packages = %w{autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf gcc libc6-dev pkg-config bridge-utils uml-utilities zlib1g-dev libglib2.0-dev autoconf automake libtool libsdl1.2-dev emacs}
+packages = %w{autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf gcc libc6-dev pkg-config bridge-utils uml-utilities zlib1g-dev libglib2.0-dev autoconf automake libtool libsdl1.2-dev emacs default-jre default-jdk}
 packages.each do |pkg|
   package pkg do
     action [:install, :upgrade]
@@ -29,11 +29,15 @@ git "/home/vagrant/riscv-tools" do
   revision "master"
   enable_submodules true
   action :sync
+  user "vagrant"
+  group "vagrant"
 end
 
 bash "Set Environment of RISCV-tools" do
   code "sed -i 's/JOBS=16/JOBS=1/' /home/vagrant/riscv-tools/build.common"
   action :run
+  user "vagrant"
+  group "vagrant"
 end
 
 ENV['TOP']   = "/home/vagrant/"
@@ -44,4 +48,26 @@ execute "Build RISCV-tools" do
   cwd "/home/vagrant/riscv-tools/"
   command "./build.sh"
   action :run
+  user "vagrant"
+  group "vagrant"
+end
+
+#
+# Building BOOM
+#
+git "/home/vagrant/rocket-chip" do
+  repository "https://github.com/ucb-bar/rocket-chip.git"
+  revision "boom"
+  enable_submodules true
+  action :sync
+  user "vagrant"
+  group "vagrant"
+end
+
+execute "Build RISCV-tools" do
+  cwd "/home/vagrant/rocket-chip/emulator/"
+  command "make run CONFIG=BOOMConfig"
+  action :run
+  user "vagrant"
+  group "vagrant"
 end
