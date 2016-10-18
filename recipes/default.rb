@@ -58,7 +58,7 @@ end
 #
 git "/home/vagrant/rocket-chip" do
   repository "https://github.com/ucb-bar/rocket-chip.git"
-  revision "boom"
+  checkout_branch "boom"
   enable_submodules true
   action :sync
   user "vagrant"
